@@ -1,9 +1,8 @@
 pub fn part1(input: &str) -> u32 {
     let mut sum = 0;
     input.lines().fold(50, |current, line| {
-        let mut chars = line.chars();
-        let direction = chars.next().unwrap();
-        let distance: i32 = String::from_iter(chars).parse().unwrap();
+        let direction = line.chars().next().unwrap();
+        let distance: i32 = line[1..].parse().unwrap();
 
         let next = match direction {
             'L' => current - distance,
@@ -24,9 +23,8 @@ pub fn part1(input: &str) -> u32 {
 pub fn part2(input: &str) -> i32 {
     let mut sum = 0;
     input.lines().fold(50, |current, line| {
-        let mut chars = line.chars();
-        let direction = chars.next().unwrap();
-        let mut distance: i32 = String::from_iter(chars).parse().unwrap();
+        let direction = line.chars().next().unwrap();
+        let mut distance: i32 = line[1..].parse().unwrap();
 
         sum += distance / 100;
         distance %= 100;
