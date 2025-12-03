@@ -43,28 +43,32 @@ pub fn part1(input: &str) -> u64 {
         .sum()
 }
 
-pub fn part2(input: &str) -> i32 {
-    // if a.len() % 2 == 0 {
-    //     if a.len() == b.len() {
-    //         let start: u64 = a[..a.len() / 2].parse().unwrap();
-    //         let end: u64 = b[..b.len() / 2].parse().unwrap();
-    //
-    //         end - start
-    //     } else {
-    //         let start: u64 = a[..a.len() / 2].parse().unwrap();
-    //         let end = 10u64.pow(b.len() as u32 / 2 + 1);
-    //
-    //         end - start
-    //     }
-    // } else if b.len() % 2 == 0 {
-    //     let start = 10u64.pow(b.len() as u32 / 2 - 1);
-    //     let end: u64 = b[..b.len() / 2].parse().unwrap();
-    //
-    //     end - start
-    // } else {
-    //     0
-    // }
-    0
+pub fn part2(input: &str) -> u64 {
+    input
+        .trim()
+        .split(',')
+        .map(|x| x.split_once('-').unwrap())
+        .flat_map(|(a, b)| {
+            let a: u64 = a.parse().unwrap();
+            let b: u64 = b.parse().unwrap();
+
+            (a..=b).filter(|x| {
+                let id: Vec<char> = x.to_string().chars().collect();
+                let len = id.len();
+                for i in 2..=len {
+                    if !len.is_multiple_of(i) {
+                        continue;
+                    }
+                    let mut chunks = id.chunks_exact(len / i);
+                    let pattern = chunks.next().unwrap();
+                    if chunks.all(|x| x == pattern) {
+                        return true;
+                    }
+                }
+                false
+            })
+        })
+        .sum::<u64>()
 }
 
 const INPUT: &str = include_str!("../../inputs/day_02.txt");
@@ -89,13 +93,13 @@ mod test {
 
     #[test]
     fn test_part_1() {
-        assert_eq!(part1(EXAMPLE_INPUT_1), 1_1227775554);
+        assert_eq!(part1(EXAMPLE_INPUT_1), 1227775554);
     }
 
     const EXAMPLE_INPUT_2: &str = EXAMPLE_INPUT_1;
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part2(EXAMPLE_INPUT_2), 6);
+        assert_eq!(part2(EXAMPLE_INPUT_2), 4174379265);
     }
 }
