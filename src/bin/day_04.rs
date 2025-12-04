@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 pub fn part1(input: &str) -> usize {
     let mut row_len: isize = 0;
     let grid: Vec<bool> = input
@@ -49,12 +51,18 @@ pub fn part2(input: &str) -> usize {
 
     let mut removed_rolls = 0;
 
+    let mut rolls: HashSet<usize> = grid
+        .iter()
+        .enumerate()
+        .filter(|(_, &x)| x)
+        .map(|(i, _)| i)
+        .collect();
+
     loop {
-        let to_remove: Vec<usize> = grid
-            .iter()
-            .enumerate()
-            .filter(|(_, &x)| x)
-            .filter(|(i, _)| {
+        let mut next_rolls: HashSet<usize> = HashSet::new();
+        let to_remove: HashSet<usize> = rolls
+            .into_iter()
+            .filter(|i| {
                 let index = *i as isize;
                 let above = index - row_len;
                 let below = index + row_len;
@@ -62,7 +70,7 @@ pub fn part2(input: &str) -> usize {
                 let border_bottom = index >= grid.len() as isize - row_len;
                 let border_left = index % row_len == 0;
                 let border_right = (index + 1) % row_len == 0;
-                let paper_count = [
+                let paper_rolls: Vec<usize> = [
                     (!border_top && !border_left).then_some(above - 1),
                     (!border_top).then_some(above),
                     (!border_top && !border_right).then_some(above + 1),
@@ -73,12 +81,16 @@ pub fn part2(input: &str) -> usize {
                     (!border_bottom && !border_right).then_some(below + 1),
                 ]
                 .into_iter()
-                .filter(|x| x.is_some_and(|y| grid[y as usize]))
-                .count();
-                paper_count < 4
+                .filter_map(|x| x.map(|y| y as usize).and_then(|y| grid[y].then_some(y)))
+                .collect();
+                if paper_rolls.len() < 4 {
+                    next_rolls.extend(&paper_rolls);
+                    return true;
+                }
+                false
             })
-            .map(|(i, _)| i)
             .collect();
+
         if to_remove.is_empty() {
             break;
         }
@@ -87,7 +99,9 @@ pub fn part2(input: &str) -> usize {
 
         for pos in to_remove {
             grid[pos] = false;
+            next_rolls.remove(&pos);
         }
+        rolls = next_rolls;
     }
 
     removed_rolls
