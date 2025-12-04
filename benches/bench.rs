@@ -6,7 +6,8 @@ use criterion::{criterion_group, criterion_main};
 
 #[rustfmt::skip]
 aoc2025::benches!(
-    day_01
+    day_01,
+    day_04
 );
 
 criterion_main!(benchmarks);
